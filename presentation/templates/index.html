@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>大富翁</title>
+        <meta http-equiv="Access-Control-Allow-Origin" content="*" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dfw.css')}}"/>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css')}}"/>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap-theme.min.css')}}"/>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.8.3.min.js')}}"></script>
+        <script src="{{ url_for('static', filename='js/echarts-all.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/dfw.js')}}"></script>
+
+    <style>
+        li { list-style: none; }
+    </style>
+
+</head>
+<body role="document" style='background-color:#eee'> 
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <!--<a class="navbar-brand" href="#"><img alt="Brand" src="{{url_for('static', filename='babelfish.png')}}"
+                height = "28px" style="margin:0px;"></a>-->
+            <a class="navbar-brand" href="#">大富翁</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="/">交易首页</a></li>
+                <li><a href="/" target='_self'>我的信息</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/logout" target='_self'>登出</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+    </nav>
+    <div class="container-fluid theme-showcase" role="main" style="margin-top:60px;">
+        <div class="row">
+            <div class="col-md-7">
+                <div id="furture_fig" class="border shadow">
+                </div>
+            </div>
+            <div class="col-md-3 col-xs-6">
+                <div id="trader_fig" class="border shadow">
+
+                </div>
+
+            </div>
+            <div class="col-md-2 col-xs-6">
+                <center>
+                <button type="button" id="buy-btn" onclick="click_buy()" class="btn btn-success btn-div btn-top">买入</button>
+                <button type="button" id="sell-btn" onclick="click_sell()" class="btn btn-info btn-div btn-top">卖出</button>
+                <button type="button" class="btn btn-warning btn-div btn-top">平仓</button>
+                </center>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-7">
+                <div id="singe-trade" class="user-win-info border shadow">
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div id="total-trade" class="user-win-info border shadow">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

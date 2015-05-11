@@ -1,0 +1,87 @@
+.sign_in {
+    padding-right: 15px;
+    padding-left: 15px;
+    padding-top: 50px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+#furture_fig{
+    width:100%;
+    height: 430px;
+}
+.user-win-info{
+    width:100%;
+    height: 120px;
+}
+
+#trader_fig{
+    width:100%;
+    height: 430px;
+}
+
+#login_slide{
+    width:100%;
+    height: 500px;
+}
+.border
+{
+    border:3px solid #fff;
+    margin-bottom:15px;
+    background:#fff;
+}
+.shadow
+{ 
+    display: inline-block;
+    padding: 5px 10px 6px;
+    text-decoration: none;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    border-bottom: 1px solid rgba(0,0,0,0.25);
+    position: relative;
+    cursor: pointer;
+    margin-top:10px;
+}
+.content-u{
+    height:555px;
+    width:100%;
+}
+.content-v{
+    height:480px;
+    width:100%;
+    padding:0px;
+    margin:0px;
+}
+.content-w{
+    height:40px;
+    width:100%;
+}
+.btn-div{
+    height:100px;
+    width:70%;
+}
+.btn-top{
+    margin-top: 35px; 
+}
+.btn-center-top{
+    margin-top:10px;
+}
+/* Sidebar navigation */
+.nav-sidebar {
+    margin-right: -21px; /* 20px padding + 1px border */
+    margin-bottom: 20px;
+    margin-left: -20px;
+  }
+  .nav-sidebar > li > a {
+      padding-right: 20px;
+      padding-left: 20px;
+      }
+      .nav-sidebar > .active > a,
+      .nav-sidebar > .active > a:hover,
+      .nav-sidebar > .active > a:focus {
+          color: #fff;
+          background-color: #428bca;
+          }
