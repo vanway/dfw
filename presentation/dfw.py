@@ -8,12 +8,13 @@ from flask.ext.uwsgi_websocket import GeventWebSocket
 import thread
 import random
 import time
-import os
 import ujson
 
 FILE_PATH = os.path.split(os.path.realpath(__file__))[0]
 sys.path.append('{0}/../data_access'.format(FILE_PATH))
+sys.path.append('{0}/../logic'.format(FILE_PATH))
 
+import user_manager
 from mysql_manager import MysqlManager
 
 app = Flask(__name__)
@@ -40,22 +41,20 @@ cur_price = 0.0
 # set the secret key.  keep this really secret:
 app.secret_key = 'B0yrkdl/3yX R~XHH!jmN]7yh/,?RT'
 
+def update_users_privilege():
+    while True:
+        global admin
+        global pass_users
+        admin = user_manager.get_admin()
+        pass_users = user_manager.get_users()
+        time.sleep(30)
+
+
 def send_random_msg():
     while True:
-        global pass_users
-        global admin
         global cur_price
-        pass_users = dict([(item[1], item[1:])  for item in MysqlManager.get_users()])
-        admin = MysqlManager.get_admin()[1:]
         cur_price = random.randint(3500, 4200) + random.random()
-        sell_5 = []
-        buy_5 = []
-        for i in range(5):
-            sell_5.append([u"卖{}".format(str(i+1)), cur_price + i, random.randint(1, 1000)])
-            buy_5.append([u"买{}".format(str(i+1)), cur_price - i, random.randint(1, 1000)])
-        sell_5.reverse()
-        sell_5.extend(buy_5)
-        msg_dict = {"trade_info": sell_5, "cur_price": cur_price}
+        msg_dict = {"trade_info": [], "cur_price": cur_price}
         msg = ujson.dumps(msg_dict, ensure_ascii=False)
         for user_id in users:
             users[user_id].send(msg)
@@ -66,9 +65,10 @@ def send_random_msg():
             user_trade_info[user_id] = item
             msg = ujson.dumps({'single_trade': item}, ensure_ascii=False)
             users[user_id].send(msg)
-        time.sleep(1)
+        time.sleep(0.5)
 
 thread.start_new_thread(send_random_msg)
+thread.start_new_thread(update_users_privilege)
 
 @ws.route('/websocket')
 def chat(ws):
@@ -95,9 +95,18 @@ def chat(ws):
             if typex == "2":
                 now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
                 user_trade_info[ws.id] = [now_time, pass_users[user_match_dict[ws.id]][3], cur_price, cur_price, 0]
+                trade_stream = [now_time, pass_users[user_match_dict[ws.id]][1], typex, "user", cur_price]
+                MysqlManager.insert_stream_trade(trade_stream)
                 msg = ujson.dumps({'single_trade': user_trade_info[ws.id]}, ensure_ascii=False)
                 users[ws.id].send(msg)
             if typex == "3":
+                now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
+                user_trade_info[ws.id] = [now_time, pass_users[user_match_dict[ws.id]][3], cur_price, cur_price, 0]
+                trade_stream = [now_time, pass_users[user_match_dict[ws.id]][1], typex, "user", cur_price]
+                MysqlManager.insert_stream_trade(trade_stream)
+                msg = ujson.dumps({'single_trade': user_trade_info[ws.id]}, ensure_ascii=False)
+                users[ws.id].send(msg)
+            if typex == "4":
                 MysqlManager.update_item([user_trade_info[ws.id][-1], user_match_dict[ws.id]])
                 user = MysqlManager.get_user_by_name([user_match_dict[ws.id]])[1: ]
                 total_trade = [user[0], user[2], user[3], user[3]-user[2]]

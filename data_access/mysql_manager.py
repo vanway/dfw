@@ -50,6 +50,7 @@ class MysqlManager(object):
                 conn.close()
             if cur:
                 cur.close()
+
     @staticmethod
     def get_admin():
         conn = MysqlManager.get_conn()
@@ -69,6 +70,28 @@ class MysqlManager(object):
               Update Users 
               set AccountMoney = AccountMoney + %s
               where AccountName = %s
+              '''
+        try:
+            cur.execute(sql, items)
+            conn.commit()
+            return True
+        except Exception as e:
+            print e
+            return False
+        finally:
+            if conn:
+                conn.close()
+            if cur:
+                cur.close()
+
+    @staticmethod
+    def insert_stream_trade(items):
+        conn = MysqlManager.get_conn()
+        cur = conn.cursor()
+        sql = '''
+              insert Trade_Stream 
+              (StatTime, AccountName, Operate, Belong, Point) 
+              values(%s, %s, %s, %s, %s)
               '''
         try:
             cur.execute(sql, items)

@@ -14,4 +14,3 @@ public:
 	int    nBidVol[5];	  //ÉêÂòÁ¿
 	char   szTimeStamp[9];//Ê±¼ähh:mm:ss
 };
-

@@ -1,13 +1,14 @@
 #pragma once
 #include "ThostFtdcMdApi.h"
 #include "FutureInfor.h"
+#include<linux/string.h>
 #pragma pack(4)
+typedef void (*pInfoProcessFunc) (double lastPrice);
 
 class CFutureInforManager: public CThostFtdcMdSpi
 {
 private:
 	void ReqUserLogin();//请求登陆
-	void SubscribeMarketData();	//请求行情订阅
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);//判断返回的结果是不是错误
 
 public:	
@@ -19,12 +20,13 @@ public:
 	char *ppInstrumentID[8];// 行情订阅列表
 	int iInstrumentID;	// 行情订阅数量	
 	int iRequestID ;
+    pInfoProcessFunc futureInfoFun;
 	
 	bool bConnected;//连接成功
 	bool bLogined;//登陆成功
 	/**************************方法********************/
 	void loadArgs();//加载参数，服务器地址，账户密码
-	void init();	//初始化（加载参数，初始化CTP的API)
+	void init(pInfoProcessFunc futureInfoFun);	//初始化（加载参数，初始化CTP的API)
 	CFutureInforManager(void);
 	~CFutureInforManager(void);
 	/*****************************************/
@@ -58,6 +60,7 @@ public:
 
 	///深度行情通知
 	virtual void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData);
+	void SubscribeMarketData();	//请求行情订阅
 
 
 };

@@ -63,12 +63,18 @@ $(document).ready(function() {
 function click_buy(){
     g_ws.send("2,,");
     document.getElementById('buy-btn').setAttribute("disabled", "disabled");
+    document.getElementById('sell-btn').setAttribute("disabled", "disabled");
 }
 function click_sell(){
     g_ws.send("3,,");
+    document.getElementById('buy-btn').setAttribute("disabled", "disabled");
+    document.getElementById('sell-btn').setAttribute("disabled", "disabled");
+}
+function click_pingcan(){
+    g_ws.send("4,,");
     document.getElementById('buy-btn').removeAttribute("disabled");
-    $('#singe-trade').empty();
-    
+    document.getElementById('sell-btn').removeAttribute("disabled");
+    $('#singe-trade').empty();   
 }
 
 function update_furture_fig(date_str){
