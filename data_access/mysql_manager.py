@@ -90,8 +90,8 @@ class MysqlManager(object):
         cur = conn.cursor()
         sql = '''
               insert Trade_Stream 
-              (StatTime, AccountName, Operate, Belong, Point) 
-              values(%s, %s, %s, %s, %s)
+              (StatTime, AccountName, Operate, Belong, Point, Status) 
+              values(%s, %s, %s, %s, %s, %s)
               '''
         try:
             cur.execute(sql, items)
@@ -100,6 +100,25 @@ class MysqlManager(object):
         except Exception as e:
             print e
             return False
+        finally:
+            if conn:
+                conn.close()
+            if cur:
+                cur.close()
+
+    @staticmethod
+    def get_trade_stream(params):
+        conn = MysqlManager.get_conn()
+        cur = conn.cursor()
+        sql = ''' select convert(StatTime, char),AccountName,Operate,Point,Status from Trade_Stream where Belong = %s '''
+        try:
+            cur.execute(sql, params)
+            conn.commit()
+            result = [i for i in cur.fetchall()]
+            return result
+        except Exception as e:
+            print e
+            return None
         finally:
             if conn:
                 conn.close()

@@ -1,6 +1,9 @@
 #coding=utf-8
 import os
 import sys
+import gevent.monkey
+gevent.monkey.patch_all()
+
 from collections import deque
 from flask import Flask, render_template, session, redirect, url_for, escape, request, make_response
 from flask.ext.uwsgi_websocket import GeventWebSocket
@@ -9,6 +12,7 @@ import thread
 import random
 import time
 import ujson
+from ctypes import *
 
 FILE_PATH = os.path.split(os.path.realpath(__file__))[0]
 sys.path.append('{0}/../data_access'.format(FILE_PATH))
@@ -67,7 +71,33 @@ def send_random_msg():
             users[user_id].send(msg)
         time.sleep(0.5)
 
-thread.start_new_thread(send_random_msg)
+def get_future_info(_cur_price):
+    global cur_price
+    print "================================="
+    print _cur_price
+    cur_price = _cur_price
+    msg_dict = {"trade_info": [], "cur_price": cur_price}
+    msg = ujson.dumps(msg_dict, ensure_ascii=False)
+    for user_id in users:
+        users[user_id].send(msg)
+    for user_id in user_trade_info:
+        item = user_trade_info[user_id]
+        item[-2] = cur_price
+        item[-1] = (cur_price - item[-3]) * 300
+        user_trade_info[user_id] = item
+        msg = ujson.dumps({'single_trade': item}, ensure_ascii=False)
+        users[user_id].send(msg)
+
+def get_future_info_t():
+    api = CDLL("../traderapi/testx.so")
+    pGetFutureInfo = CFUNCTYPE(c_void_p,c_double)
+    pGetFutureInfoHandle = pGetFutureInfo(get_future_info)
+    api.StartSubjectFutureInfo(pGetFutureInfoHandle)
+    while(1):
+        time.sleep(2)
+
+#get_future_info_t()
+thread.start_new_thread(get_future_info_t)
 thread.start_new_thread(update_users_privilege)
 
 @ws.route('/websocket')
@@ -95,19 +125,28 @@ def chat(ws):
             if typex == "2":
                 now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
                 user_trade_info[ws.id] = [now_time, pass_users[user_match_dict[ws.id]][3], cur_price, cur_price, 0]
-                trade_stream = [now_time, pass_users[user_match_dict[ws.id]][1], typex, "user", cur_price]
+
+                trade_stream = [now_time, pass_users[user_match_dict[ws.id]][0], typex, "user", cur_price, "1"]
                 MysqlManager.insert_stream_trade(trade_stream)
+
                 msg = ujson.dumps({'single_trade': user_trade_info[ws.id]}, ensure_ascii=False)
                 users[ws.id].send(msg)
             if typex == "3":
                 now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
                 user_trade_info[ws.id] = [now_time, pass_users[user_match_dict[ws.id]][3], cur_price, cur_price, 0]
-                trade_stream = [now_time, pass_users[user_match_dict[ws.id]][1], typex, "user", cur_price]
+
+                trade_stream = [now_time, pass_users[user_match_dict[ws.id]][0], typex, "user", cur_price, "1"]
                 MysqlManager.insert_stream_trade(trade_stream)
+
                 msg = ujson.dumps({'single_trade': user_trade_info[ws.id]}, ensure_ascii=False)
                 users[ws.id].send(msg)
             if typex == "4":
                 MysqlManager.update_item([user_trade_info[ws.id][-1], user_match_dict[ws.id]])
+
+                now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
+                trade_stream = [now_time, pass_users[user_match_dict[ws.id]][0], typex, "user", cur_price, "1"]
+                MysqlManager.insert_stream_trade(trade_stream)
+
                 user = MysqlManager.get_user_by_name([user_match_dict[ws.id]])[1: ]
                 total_trade = [user[0], user[2], user[3], user[3]-user[2]]
                 msg = ujson.dumps({'total_trade': total_trade}, ensure_ascii=False)
@@ -119,6 +158,29 @@ def chat(ws):
     del users[ws.id]
     del user_trade_info[ws.id]
     print '======================='
+
+@app.route('/admin/getUserList')
+def get_user_list():
+    result = []
+    online_users = set([user_match_dict[ws_id] for ws_id in user_match_dict])
+    for name in pass_users:
+        user = pass_users[name]
+        status = "0"
+        if name in online_users:
+            status = "1"
+        mid = [user[0], user[4], user[2], user[3], user[3]-user[2], user[5], user[6], status]
+        result.append(mid)
+    return ujson.dumps(result, ensure_ascii=False)
+
+@app.route('/getUserStream')
+def get_user_stream():
+    result = MysqlManager.get_trade_stream(["user"])
+    return ujson.dumps(result, ensure_ascii=False)
+
+@app.route('/getServerStream')
+def get_server_stream():
+    result = MysqlManager.get_trade_stream(["server"])
+    return ujson.dumps(result, ensure_ascii=False)
 
 @app.route('/admin')
 def admin():
@@ -158,3 +220,4 @@ def logout():
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True, gevent=100)
+    #app.run(host="0.0.0.0", debug=True)

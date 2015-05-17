@@ -43,7 +43,7 @@ $(document).ready(function() {
             update_furture_fig(evt_dict.cur_price);
         }
         if (typeof(evt_dict.trade_info) != "undefined") { 
-            getTradeData(evt_dict.trade_info);
+            getTradeData(evt_dict.cur_price);
         }
         if (typeof(evt_dict.single_trade) != "undefined") { 
             getSingleData(evt_dict.single_trade);
@@ -163,7 +163,7 @@ function init_furture_fig(){
     elementDL.style.backgroundColor = '#ffffff';
 }
 
-function getTradeData(data){
+function getTradeData(cur_price){
     //var data = [['卖5',51.88,78],['卖4',51.85,40],['卖3',51.84,8],['卖2',51.80,7190],['卖1',51.79, 100],['买1',51.71,5],['买2',51.60,4],['买3',51.50,101],['买4',51.45,59],['买5',51.43,4]];
     var table = $('<table class="table">');
 
@@ -172,11 +172,10 @@ function getTradeData(data){
 
     var tbody = $('<tbody>');
 
-    for(var i in data) {
         var tr = $('<tr>');
-        var wudang = $('<td>' + data[i][0] + '</td>');
-        var price = $('<td><font color="red">' + data[i][1].toFixed(2) + '</font></td>');
-        var volumn = $('<td>' + data[i][2] + '</td>');
+        var wudang = $('<td>' + "当前指数" + '</td>');
+        var price = $('<td><font color="red">' + cur_price.toFixed(2) + '</font></td>');
+        var volumn = $('<td>' + "" + '</td>');
         tr.append(wudang);
         tr.append(price);
         tr.append(volumn);
