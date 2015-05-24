@@ -1,7 +1,7 @@
-#include "StdAfx.h"
 #include "FutureTrader.h"
 #include "ThostFtdcTraderApi.h"
 #include <iostream>
+#include <Python.h>
 using namespace std;
 
 #pragma warning(disable : 4996)
@@ -287,19 +287,21 @@ void CFutureTrader::OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradi
 	}else{
 		//AfxMessageBox("²éÑ¯×Ê½ðÊ§°Ü");
 	}
-
+    this.pQueryAccountInfoFunc(this->userAccount, pTradingAccount->Available, pTradingAccount.CurrMargin, pTradingAccount->Balance);
 }
 
 void CFutureTrader::setQueryFunc(pQueryAccountInfoFunc _queryAccountInfoFunc){
-    this->
-    }
+    this->queryAccountInfoFunc = _queryAccountInfoFunc;
+}
 
-int main(){
+extern "C"
+int queryAccount(pQueryAccountInfoFunc _queryAccountInfoFunc){
     CFutureTrader mTrader;
     mTrader.loadArgs();
     mTrader.init();
+    mTrader.setQueryFunc(_queryAccountInfoFunc);
     Sleep(100);
     if(true == mTrader.bRunning){
         mTrader.ReqQryTradingAccount();
-        }
     }
+}
