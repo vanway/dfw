@@ -1,6 +1,9 @@
 #pragma once
 #include "ThostFtdcTraderApi.h"
 #pragma pack(4)
+
+typedef void (*pQueryAccountInfoFunc)(char* accountName, double availavle, double currMargin, double balance);
+
 class CFutureTrader : public CThostFtdcTraderSpi
 {
 		
@@ -25,12 +28,13 @@ public:
 	/************方法******************/
 	CFutureTrader(void);
 	~CFutureTrader();
-	
+
+	pQueryAccountInfoFunc queryAccountInfoFunc;
+    void setQueryFunc(pQueryAccountInfoFunc _queryAccountInfoFunc);
+
 	void loadArgs();
 	void init();
-    bool executeMarketOrder(char * code, int Qty, int direct, int openClose,TThostFtdcOrderRefType	ORDER_REF);  //市价交易函数
-
-
+    bool executeMarketOrder(char * code, int Qty, int direct, int openClose,TThostFtdcOrderRefType ORDER_REF);  //市价交易函数
 	///当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
 	virtual void OnFrontConnected();
 
@@ -43,8 +47,6 @@ public:
 
 	///请求查询资金账户响应
 	virtual void OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradingAccount, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-
-
 
 	///错误应答
 	virtual void OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -60,7 +62,6 @@ public:
 
 	///成交通知
 	virtual void OnRtnTrade(CThostFtdcTradeField *pTrade);
-	
 
 	///用户登录请求
 	void ReqUserLogin();

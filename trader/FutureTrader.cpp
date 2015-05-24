@@ -145,7 +145,7 @@ void CFutureTrader::loadArgs()
 	this->addr ="";
 	this->pwd="";
 	this->userAccount="";	
-	BROKER_ID = "88888";				// 申万的经纪公司代码是"4070"
+	BROKER_ID = "";				// 申万的经纪公司代码是"4070"
 }
 void CFutureTrader::init(){
 
@@ -287,4 +287,19 @@ void CFutureTrader::OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradi
 	}else{
 		//AfxMessageBox("查询资金失败");
 	}
+
 }
+
+void CFutureTrader::setQueryFunc(pQueryAccountInfoFunc _queryAccountInfoFunc){
+    this->
+    }
+
+int main(){
+    CFutureTrader mTrader;
+    mTrader.loadArgs();
+    mTrader.init();
+    Sleep(100);
+    if(true == mTrader.bRunning){
+        mTrader.ReqQryTradingAccount();
+        }
+    }
