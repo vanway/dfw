@@ -24,8 +24,28 @@ from mysql_manager import MysqlManager
 app = Flask(__name__)
 ws = GeventWebSocket(app)
 
+#行情指数队列
+price_deque = deque(maxlen=2*60*5)
+
 #ws 链接的用户
 users = {}
+
+# 开启状态
+g_is_open = False
+
+#### 交易变量
+# 当前价格
+cur_price = 0.0
+#单价
+g_unit_price = 0.0
+#行情地址
+g_server_ip = ''
+#帐号
+g_big_account_name = ''
+#密码
+g_big_account_pw = ''
+#期货代码
+g_future_code = ''
 
 #有权限的用户
 pass_users = {}
@@ -39,9 +59,6 @@ user_match_dict = {}
 #用户交易信息
 user_trade_info = {}
 
-# 当前价格
-cur_price = 0.0
-
 # set the secret key.  keep this really secret:
 app.secret_key = 'B0yrkdl/3yX R~XHH!jmN]7yh/,?RT'
 
@@ -53,11 +70,11 @@ def update_users_privilege():
         pass_users = user_manager.get_users()
         time.sleep(30)
 
-
 def send_random_msg():
     while True:
         global cur_price
-        cur_price = random.randint(3500, 4200) + random.random()
+        cur_price = float('%0.2f'%(random.randint(3500, 4200) + random.random()))
+        price_deque.append(cur_price)
         msg_dict = {"trade_info": [], "cur_price": cur_price}
         msg = ujson.dumps(msg_dict, ensure_ascii=False)
         for user_id in users:
@@ -96,8 +113,8 @@ def get_future_info_t():
     while(1):
         time.sleep(2)
 
-#get_future_info_t()
-thread.start_new_thread(get_future_info_t)
+#thread.start_new_thread(get_future_info_t)
+thread.start_new_thread(send_random_msg)
 thread.start_new_thread(update_users_privilege)
 
 @ws.route('/websocket')
@@ -106,7 +123,6 @@ def chat(ws):
     print ws.id
 
     while True:
-        print '++++++++++++++++',  ws.id
         msg = ws.receive()
         if msg is not None:
             print msg
@@ -122,53 +138,61 @@ def chat(ws):
                 total_trade = [user[0], user[2], user[3], user[3]-user[2]]
                 msg = ujson.dumps({'total_trade': total_trade}, ensure_ascii=False)
                 users[ws.id].send(msg)
-            if typex == "2":
-                now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
-                user_trade_info[ws.id] = [now_time, pass_users[user_match_dict[ws.id]][3], cur_price, cur_price, 0]
+            if g_is_open:
+                if typex == "2":
+                    now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
+                    user_trade_info[ws.id] = [now_time, pass_users[user_match_dict[ws.id]][3], cur_price, cur_price, 0]
 
-                trade_stream = [now_time, pass_users[user_match_dict[ws.id]][0], typex, "user", cur_price, "1"]
-                MysqlManager.insert_stream_trade(trade_stream)
+                    trade_stream = [now_time, pass_users[user_match_dict[ws.id]][0], typex, "user", cur_price, "1"]
+                    MysqlManager.insert_stream_trade(trade_stream)
+                    trade_stream = [now_time, pass_users[user_match_dict[ws.id]][0], typex, "server", cur_price, "1"]
+                    MysqlManager.insert_stream_trade(trade_stream)
 
-                msg = ujson.dumps({'single_trade': user_trade_info[ws.id]}, ensure_ascii=False)
-                users[ws.id].send(msg)
-            if typex == "3":
-                now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
-                user_trade_info[ws.id] = [now_time, pass_users[user_match_dict[ws.id]][3], cur_price, cur_price, 0]
+                    msg = ujson.dumps({'single_trade': user_trade_info[ws.id]}, ensure_ascii=False)
+                    users[ws.id].send(msg)
+                if typex == "3":
+                    now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
+                    user_trade_info[ws.id] = [now_time, pass_users[user_match_dict[ws.id]][3], cur_price, cur_price, 0]
 
-                trade_stream = [now_time, pass_users[user_match_dict[ws.id]][0], typex, "user", cur_price, "1"]
-                MysqlManager.insert_stream_trade(trade_stream)
+                    trade_stream = [now_time, pass_users[user_match_dict[ws.id]][0], typex, "user", cur_price, "1"]
+                    MysqlManager.insert_stream_trade(trade_stream)
+                    trade_stream = [now_time, pass_users[user_match_dict[ws.id]][0], typex, "server", cur_price, "1"]
+                    MysqlManager.insert_stream_trade(trade_stream)
 
-                msg = ujson.dumps({'single_trade': user_trade_info[ws.id]}, ensure_ascii=False)
-                users[ws.id].send(msg)
-            if typex == "4":
-                MysqlManager.update_item([user_trade_info[ws.id][-1], user_match_dict[ws.id]])
+                    msg = ujson.dumps({'single_trade': user_trade_info[ws.id]}, ensure_ascii=False)
+                    users[ws.id].send(msg)
+                if typex == "4":
+                    MysqlManager.update_item([user_trade_info[ws.id][-1], user_match_dict[ws.id]])
 
-                now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
-                trade_stream = [now_time, pass_users[user_match_dict[ws.id]][0], typex, "user", cur_price, "1"]
-                MysqlManager.insert_stream_trade(trade_stream)
+                    now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
+                    trade_stream = [now_time, pass_users[user_match_dict[ws.id]][0], typex, "user", cur_price, "1"]
+                    MysqlManager.insert_stream_trade(trade_stream)
+                    trade_stream = [now_time, pass_users[user_match_dict[ws.id]][0], typex, "server", cur_price, "1"]
+                    MysqlManager.insert_stream_trade(trade_stream)
 
-                user = MysqlManager.get_user_by_name([user_match_dict[ws.id]])[1: ]
-                total_trade = [user[0], user[2], user[3], user[3]-user[2]]
-                msg = ujson.dumps({'total_trade': total_trade}, ensure_ascii=False)
-                users[ws.id].send(msg)
-                del user_trade_info[ws.id]
+                    user = MysqlManager.get_user_by_name([user_match_dict[ws.id]])[1: ]
+                    total_trade = [user[0], user[2], user[3], user[3]-user[2]]
+                    msg = ujson.dumps({'total_trade': total_trade}, ensure_ascii=False)
+                    users[ws.id].send(msg)
+                    del user_trade_info[ws.id]
         else:
             break
 
     del users[ws.id]
-    del user_trade_info[ws.id]
-    print '======================='
+    if ws_id in user_trade_info:
+        del user_trade_info[ws.id]
 
-@app.route('/admin/getUserList')
+@app.route('/getUserList')
 def get_user_list():
     result = []
-    online_users = set([user_match_dict[ws_id] for ws_id in user_match_dict])
+    online_users = set([user_match_dict[ws_id] for ws_id in users])
+    print online_users
     for name in pass_users:
         user = pass_users[name]
         status = "0"
         if name in online_users:
             status = "1"
-        mid = [user[0], user[4], user[2], user[3], user[3]-user[2], user[5], user[6], status]
+        mid = [user[0], user[4], user[2], user[3], user[3]-user[2], user[5], user[7], status]
         result.append(mid)
     return ujson.dumps(result, ensure_ascii=False)
 
@@ -217,6 +241,47 @@ def logout():
     session.pop('username', None)
     session.pop('password', None)
     return redirect('login')
+
+@app.route('/getInitInfo')
+def get_init_info():
+    return ujson.dumps(list(price_deque), ensure_ascii=False)
+
+@app.route('/setSwitch', methods=['GET', 'POST'])
+def set_switch():
+    if request.method == 'POST':
+        switch = request.form.get('switch', '0')
+        global g_is_open
+        if switch == '0':
+            g_is_open = False
+        elif switch == '1':
+            g_is_open = True
+
+@app.route('/getSwitch', methods=['GET', 'POST'])
+def get_switch():
+    return str(g_is_open)
+
+@app.route('/setTradeParams', methods=['GET', 'POST'])
+def set_trade_params():
+    if request.method == 'POST':
+        global g_unit_price
+        global g_server_ip
+        global g_big_account_name
+        global g_big_account_pw
+        global g_future_code
+        g_unit_price = request.form['unit_price']
+        g_server_ip = request.form['server_ip']
+        g_big_account_name = request.form['big_account_name']
+        g_big_account_pw = request.form['big_account_pw']
+        g_future_code = request.form['future_code']
+
+@app.route('/addUser', methods=['GET', 'POST'])
+def add_user():
+    if request.method == 'POST':
+        key_list = ['AccountName', 'Password', 'UserName', 'RechargeMoney', \
+                'RechargeMoney', 'Mobile', 'IDCard', 'Star']
+        item = [request.form[key] for key in key_list]
+        print MysqlManager.insert_user(item)
+        return "ok"
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True, gevent=100)

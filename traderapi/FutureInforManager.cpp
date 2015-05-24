@@ -150,7 +150,6 @@ void CFutureInforManager::loadArgs(){
 
 }
 void CFutureInforManager::init(pInfoProcessFunc _futureInfoFun){
-
 	//this->loadArgs();//加载参数
 	this->addr = "tcp://219.143.242.147:41213";		// 前置地址
 	this->BROKER_ID = "88888";				// 经纪公司代码
@@ -164,7 +163,6 @@ void CFutureInforManager::init(pInfoProcessFunc _futureInfoFun){
 	pUserApi->RegisterSpi(this);						// 注册事件类
 	pUserApi->RegisterFront(this->addr);					// connect
 	pUserApi->Init();
-
 	//pUserApi->Join();
 }
 

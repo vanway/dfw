@@ -90,8 +90,8 @@ class MysqlManager(object):
         cur = conn.cursor()
         sql = '''
               insert Trade_Stream 
-              (StatTime, AccountName, Operate, Belong, Point, Status) 
-              values(%s, %s, %s, %s, %s, %s)
+              (StatTime, AccountName, Operate, Belong, Point, Status, LastUpdateTime) 
+              values(%s, %s, %s, %s, %s, %s, now())
               '''
         try:
             cur.execute(sql, items)
@@ -119,6 +119,28 @@ class MysqlManager(object):
         except Exception as e:
             print e
             return None
+        finally:
+            if conn:
+                conn.close()
+            if cur:
+                cur.close()
+
+    @staticmethod
+    def insert_user(item):
+        conn = MysqlManager.get_conn()
+        cur = conn.cursor()
+        sql = '''
+              insert Users 
+              (AccountName, Password, UserName, RechargeMoney, AccountMoney, Mobile, IDCard, Star, CreateTime) 
+              values(%s, %s, %s, %s, %s, %s, %s, %s, now())
+              '''
+        try:
+            cur.execute(sql, item)
+            conn.commit()
+            return True
+        except Exception as e:
+            print e
+            return False
         finally:
             if conn:
                 conn.close()

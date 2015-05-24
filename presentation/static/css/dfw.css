@@ -59,6 +59,44 @@
     height:40px;
     width:100%;
 }
+.content-stream{
+    height:430px;
+    width:100%;
+    padding:0px;
+    margin:0px;
+}
+.content-account-fig{
+    height:250px;
+    padding:30px;
+    margin:0px;
+}
+.content-account-inner{
+    height:200px;
+    padding:20px;
+    margin:0px;
+    border: 1px solid #eee;
+    text-align: center;
+}
+.content-account-inner .glyphicon{
+font-size: 75px;
+margin-bottom: 35px;
+}
+.content-account-inner:hover{
+background-color: #337ab7;
+color: #fff;
+}
+.content-account-inner .glyphicon-class{
+    display: block;
+    text-align: center;
+    word-wrap: break-word;
+}
+.content-account-detail{
+    height:250px;
+    width:100%;
+    padding:25px;
+    margin:0px;
+    text-align: center;
+}
 .btn-div{
     height:100px;
     width:70%;
@@ -68,6 +106,25 @@
 }
 .btn-center-top{
     margin-top:10px;
+}
+.padding-x{
+    padding: 5px;
+}
+.content-user-list{
+    height:520px;
+    width:100%;
+    padding-top:10px;
+    padding-bottom:10px;
+    margin:0px;
+}
+.center-div{
+    margin: 0 auto;
+}
+.add-user-form{
+    padding-top: 30px;
+}
+.add-user-form div{
+    margin-bottom: 15px;
 }
 /* Sidebar navigation */
 .nav-sidebar {

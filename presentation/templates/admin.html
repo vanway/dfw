@@ -7,7 +7,11 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dfw.css')}}"/>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css')}}"/>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap-theme.min.css')}}"/>
-        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.8.3.min.js')}}"></script>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery.dataTables.min.css')}}"/>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.11.3.min.js')}}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.dataTables.min.js')}}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.raty.min.js')}}"></script>
         <script src="{{ url_for('static', filename='js/echarts-all.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='js/dfw_admin.js')}}"></script>
 
@@ -45,44 +49,20 @@
                     </div>
                     <br/>
                     <div class="list-group">
-                        <a href="#" id="dpid" class="list-group-item active" onclick="getUserList()">客户列表</a>
-                        <a href="#" id="dpid" class="list-group-item " onclick="set_cheat_user_click()">新增客户</a>
-                        <a href="#" id="guid" class="list-group-item" onclick="set_cheat_user_click()" >交易流水</a>
-                        <a href="#" id="user_id" class="list-group-item" onclick="set_cheat_user_click()">全局管理</a>
-                        <a href="#" id="user_ip" class="list-group-item"  onclick="set_cheat_user_click()">大账户信息<span class="badge">pc</span></a>
+                        <a href="#" id="account_info_menu" class="list-group-item"  onclick="getAccountInfo('account_info_menu')">
+                            <span class="glyphicon glyphicon-home" aria-hidden="true"></span>&nbsp;大账户信息</a>
+                        <a href="#" id="user_list_menu" class="list-group-item" onclick="getUserList('user_list_menu')">
+                            <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>&nbsp;客户列表</a>
+                        <a href="#" id="add_user_menu" class="list-group-item " onclick="addUser('add_user_menu')">
+                            <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>&nbsp;新增客户</a>
+                        <a href="#" id="trade_stream_menu" class="list-group-item" onclick="getTradeData('trade_stream_menu')" >
+                            <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>&nbsp;交易流水</a>
+                        <a href="#" id="global_set_menu" class="list-group-item" onclick="globalSet('global_set_menu')">
+                            <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;全局管理</a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-9">
-            <!-- 用户列表 -->
-            <div class="shadow border content-u" id='div_user_list' hidden>
-                <div class="content-v">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>用户id</th>
-                                <th>用户姓名</th>
-                                <th>累计充值</th>
-                                <th>当前余额</th>
-                                <th>总盈亏</th>
-                                <th>电话号码</th>
-                                <th>是否在线</th>
-                            </tr>
-                        </thead>
-                        <tbody id='user_data'>
-                        </tbody>
-                    </table>
-                </div>
-                <div class='content-w'>
-                    <ul class="pager">
-                        <li class="previous" id="previous" onclick="click_previous()"><a href="#"><span
-                        aria-hidden="true">&lt-</span> Previous</a></li>
-                        <li><a href="#" id="page_index"></a></li>
-                        <li class="next" id="next" onclick="click_next()"><a href="#">Next <span
-                        aria-hidden="true">-&gt</span></a></li>
-                    </ul>
-                </div>
-                </div> <!-- 用户列表 -->
+            <div class="col-md-9" id = "right_content">
             </div>
         </div>
     </div>

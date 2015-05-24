@@ -65,6 +65,7 @@ function click_buy(){
     document.getElementById('buy-btn').setAttribute("disabled", "disabled");
     document.getElementById('sell-btn').setAttribute("disabled", "disabled");
 }
+
 function click_sell(){
     g_ws.send("3,,");
     document.getElementById('buy-btn').setAttribute("disabled", "disabled");
@@ -79,11 +80,27 @@ function click_pingcan(){
 
 function update_furture_fig(date_str){
     axisData = (new Date()).toLocaleTimeString().replace(/^\D*/,'');
-    g_furture_fig_echart.addData([[0, parseInt(date_str), false, true, axisData]]);
+    g_furture_fig_echart.addData([[0, parseFloat(date_str), false, false, axisData]]);
     //g_furture_fig_echart.setOption({});
 }
 
 function init_furture_fig(){
+    $.ajax({
+        url: "getInitInfo",
+        type: 'GET', 
+        data: {},
+        dataType: 'html', 
+        timeout: 10000,
+        error: function(){alert('Error loading document');},
+        success: function(result){ 
+            var data = eval("(" + result + ")");
+            init_furture_line(data);
+        }
+    });
+}
+
+function init_furture_line(data){
+    var len_data = data.length;
     elementDL = document.getElementById('furture_fig');
     g_furture_fig_echart = echarts.init(document.getElementById('furture_fig'));
     g_furture_fig_echart.setTheme("macarons");
@@ -120,10 +137,10 @@ function init_furture_fig(){
             data : (function (){
                 var now = new Date();
                 var res = [];
-                var len = 10;
+                var len = len_data;
                 while (len--) {
                     res.unshift(now.toLocaleTimeString().replace(/^\D*/,''));
-                    now = new Date(now - 2000);
+                    now = new Date(now - 500);
                 }
                 return res;
             })()
@@ -134,7 +151,7 @@ function init_furture_fig(){
                 type : 'value',
                 scale: true,
                 name : '指数',
-                boundaryGap: [0.2, 0.2]
+                boundaryGap: [0.002, 0.002]
             }
         ],
             series : [
@@ -142,8 +159,7 @@ function init_furture_fig(){
                 name:'IF505',
                 type:'line',
                 data:(function (){
-                    var res = [3500,3200,3400,3889,3789,3209,3590,3678,3456,3892];
-                    return res;
+                    return data;
                 })(),
                 markPoint : {
                                 data : [
@@ -171,7 +187,6 @@ function getTradeData(cur_price){
     table.append(thead);
 
     var tbody = $('<tbody>');
-
         var tr = $('<tr>');
         var wudang = $('<td>' + "当前指数" + '</td>');
         var price = $('<td><font color="red">' + cur_price.toFixed(2) + '</font></td>');
@@ -180,7 +195,6 @@ function getTradeData(cur_price){
         tr.append(price);
         tr.append(volumn);
         tbody.append(tr);
-    }
     table.append(tbody);
     $('#trader_fig').empty();
     $('#trader_fig').append(table);
