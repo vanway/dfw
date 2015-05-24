@@ -147,6 +147,71 @@ class MysqlManager(object):
             if cur:
                 cur.close()
 
+    @staticmethod
+    def user_add_money(user_name, add_money):
+        conn = MysqlManager.get_conn()
+        cur = conn.cursor()
+        sql = '''
+              update Users 
+              set RechargeMoney = RechargeMoney + %s, AccountMoney = AccountMoney + %s 
+              where AccountName = %s
+              '''
+        try:
+            cur.execute(sql, [add_money, add_money, user_name])
+            conn.commit()
+            return True
+        except Exception as e:
+            print e
+            return False
+        finally:
+            if conn:
+                conn.close()
+            if cur:
+                cur.close()
+
+    @staticmethod
+    def user_modify_star(user_name, star):
+        conn = MysqlManager.get_conn()
+        cur = conn.cursor()
+        sql = '''
+              update Users 
+              set Star = %s  
+              where AccountName = %s
+              '''
+        try:
+            cur.execute(sql, [star, user_name])
+            conn.commit()
+            return True
+        except Exception as e:
+            print e
+            return False
+        finally:
+            if conn:
+                conn.close()
+            if cur:
+                cur.close()
+
+    @staticmethod
+    def user_delete(user_name):
+        conn = MysqlManager.get_conn()
+        cur = conn.cursor()
+        sql = '''
+              delete from Users 
+              where AccountName = %s
+              '''
+        try:
+            cur.execute(sql, [user_name])
+            conn.commit()
+            return True
+        except Exception as e:
+            print e
+            return False
+        finally:
+            if conn:
+                conn.close()
+            if cur:
+                cur.close()
+
 if __name__ == '__main__':
     print MysqlManager.get_admin()
     print MysqlManager.get_users()

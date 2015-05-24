@@ -3,6 +3,55 @@ var g_pre_menu = ""; //前一个active菜单名称
 
 $(document).ready(function() {
     getAccountInfo("account_info_menu");
+    $('#addMoneyBtn').click(function(){
+        var account_name = $('#AccountName').text();
+        var addMoney = $('#addMoneyValue').val();
+        $.ajax({
+            url: "addUserMoney",
+            type: 'POST', 
+            data: {'UserName': account_name,
+            'Money': addMoney},
+            dataType: 'html', 
+            timeout: 10000,
+            error: function(){alert('Error loading document');},
+            success: function(result){ 
+                $('#add_money_model').modal('hide');
+                getUserList("user_list_menu");
+            }
+        });
+    });
+    $('#modifyStarBtn').click(function(){
+        var account_name = $('#AccountNameX').text();
+        var star = $('#UserStar').val();
+        $.ajax({
+            url: "modifyUserStar",
+            type: 'POST', 
+            data: {'UserName': account_name,
+            'Star': star},
+            dataType: 'html', 
+            timeout: 10000,
+            error: function(){alert('Error loading document');},
+            success: function(result){ 
+                $('#modify_star_model').modal('hide');
+                getUserList("user_list_menu");
+            }
+        });
+    });
+    $('#deleteBtn').click(function(){
+        var account_name = $('#AccountNameY').text();
+        $.ajax({
+            url: "deleteUser",
+            type: 'POST', 
+            data: {'UserName': account_name},
+            dataType: 'html', 
+            timeout: 10000,
+            error: function(){alert('Error loading document');},
+            success: function(result){ 
+                $('#delete_user_model').modal('hide');
+                getUserList("user_list_menu");
+            }
+        });
+    });
 });
 
 function menuChange(menu_name){
@@ -20,6 +69,69 @@ function heredoc(fn) {
 function set_cheat_user_click(){
 } 
 
+//用户加值
+function addMoney(account_name){
+    $('#add_money_model').modal('show');
+    $('#add_money_model_body').empty();
+
+    var frame = heredoc(function(){/*
+    <form class="form-horizontal add-user-form" action='/addUser' method="POST" enctype='multipart/form-data'>
+        <div class="form-group">
+            <label for="AccountName" class="col-sm-2 control-label">用户名称</label>
+            <div class="col-sm-10">
+                <span id="AccountName" class="label label-primary"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="addMoneyValue" class="col-sm-2 control-label">加值RMB</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="addMoneyValue" placeholder="add money value">
+            </div>
+        </div>
+    </form>
+    */});
+    $('#add_money_model_body').append(frame);
+    $('#AccountName').text(account_name);
+}
+//用户权限修改
+function modifyVip(account_name){
+    $('#modify_star_model').modal('show');
+    $('#modify_star_body').empty();
+    var frame = heredoc(function(){/*
+    <form class="form-horizontal add-user-form">
+        <div class="form-group">
+            <label for="AccountName" class="col-sm-2 control-label">用户名称</label>
+            <div class="col-sm-10">
+                <span id="AccountNameX" class="label label-primary"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="UserStar" class="col-sm-2 control-label">用户星级</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="UserStar" placeholder="modify user star">
+            </div>
+        </div>
+    </form>
+    */});
+    $('#modify_star_body').append(frame);
+    $('#AccountNameX').text(account_name);
+}
+//删除用户
+function deleteUser(account_name){
+    $('#delete_user_model').modal('show');
+    $('#delete_model_body').empty();
+    var frame = heredoc(function(){/*
+    <div class="form-group">
+        <label for="AccountName" class="col-sm-2 control-label">用户名称</label>
+        <div class="col-sm-10">
+            <span id="AccountNameY" class="label label-primary"></span>
+        </div>
+    </div>
+    <span>确定删除该用户？</span>
+    */});
+    $('#delete_model_body').append(frame);
+    $('#AccountNameY').text(account_name);
+}
 
 //获取用户列表
 function getUserList(menu_name) {
@@ -77,7 +189,7 @@ function getUserList(menu_name) {
             else{
                 data[i][7] = '<span class="label label-danger">离线</span>';
             }
-            var item_operate = operate.replace("account_name", data[i][0]);
+            var item_operate = operate.replace(new RegExp("account_name",'gm'), data[i][0]);
             data[i].push(item_operate);
         }
         var columns = [
@@ -118,27 +230,59 @@ function globalSet(menu_name){
     menuChange(menu_name);
     $('#right_content').empty();
     var frame = heredoc(function(){/*
-        <div class="shadow border content-u" id='div_control'>
-            <div class="input-group">
-                <span class="input-group-addon" id="basic-addon1">账号</span>
-                <input type="text" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
+    <div class="shadow border content-u" id='div_control'>
+        <div class="switch" data-on="success" data-off="warning">
+            <input type="checkbox" checked />
+        </div>
+    <form class="form-horizontal add-user-form" action='/addUser' method="POST" enctype='multipart/form-data'>
+    <div class="form-group">
+        <label for="ServerIp" class="col-sm-2 control-label">前置地址</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="ServerIp" name="ServerIp" placeholder="Server Ip">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="JAccountCode" class="col-sm-2 control-label">经纪公司代码</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="JAccountCode" name="JAccountCode" placeholder="JAccount Code"> </div>
+    </div>
+    <div class="form-group">
+        <label for="AccountName" class="col-sm-2 control-label">投资者帐号</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="AccountName" name="AccountName" placeholder="Account Code">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="AccountPassword" class="col-sm-2 control-label">帐号密码</label>
+        <div class="col-sm-10">
+            <input type="password" class="form-control" id="AccountPassword" name="AccountPassword" placeholder="Account Password">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="FutureCode" class="col-sm-2 control-label">期货代码</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="FutureCode" name="FutureCode" placeholder="Future Code">
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-default">修改</button>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="Switch" class="col-sm-2 control-label">全局开关</label>
+        <div class="col-sm-10">
+            <div class="switch has-switch" data-on="success" data-off="warning">
+            <div class="switch-on switch-animate">
+                <input type="checkbox" checked="">
+                    <span class="switch-left switch-success">ON</span>
+                    <label>&nbsp;</label>
+                    <span class="switch-right switch-warning">OFF</span>
             </div>
-
-            <div class="input-group">
-                <span class="input-group-addon" id="basic-addon2">密码</span>
-                <input type="password" class="form-control" placeholder="password" aria-describedby="basic-addon2">
-                
-            </div>
-
-            <div class="input-group">
-                <span class="input-group-addon">交易变量</span>
-                <input type="text" class="form-control" aria-describedby="basic-addon3">
-            </div>
-
-            <div class="switch" data-on="success" data-off="warning">
-                <input type="checkbox" checked />
-            </div>
-        </div> <!-- 全局管理 -->
+           </div>
+        </div>
+    </div>
+    </div> <!-- 全局管理 -->
     */});
     $('#right_content').append(frame);
 }

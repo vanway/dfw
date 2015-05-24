@@ -8,10 +8,12 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css')}}"/>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap-theme.min.css')}}"/>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery.dataTables.min.css')}}"/>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap-switch.min.css')}}"/>
         <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.11.3.min.js')}}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.dataTables.min.js')}}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.raty.min.js')}}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-switch.min.js')}}"></script>
         <script src="{{ url_for('static', filename='js/echarts-all.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='js/dfw_admin.js')}}"></script>
 
@@ -66,5 +68,43 @@
             </div>
         </div>
     </div>
+    <div class="modal fade"  id="add_money_model" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body" id="add_money_model_body">
+                </div> 
+                <div class="modal-footer" id="user_model_footer">
+                    <button id="addMoneyBtn" type="button" class="btn btn-primary">确定</button>
+                    <button type="button" class="btn btn-dark" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <div class="modal fade"  id="modify_star_model" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body" id="modify_star_body">
+
+                </div> 
+                <div class="modal-footer" id="user_model_footer">
+                    <button id="modifyStarBtn" type="button" class="btn btn-primary">确定</button>
+                    <button type="button" class="btn btn-dark" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <div class="modal fade"  id="delete_user_model" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body" id="delete_model_body">
+
+                </div> 
+                <div class="modal-footer" id="user_model_footer">
+                    <button id="deleteBtn" type="button" class="btn btn-primary">确定</button>
+                    <button type="button" class="btn btn-dark" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div> 
 </body>
 </html>

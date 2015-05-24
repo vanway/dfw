@@ -186,9 +186,9 @@ def chat(ws):
 def get_user_list():
     result = []
     online_users = set([user_match_dict[ws_id] for ws_id in users])
-    print online_users
-    for name in pass_users:
-        user = pass_users[name]
+    tmp_pass_users = user_manager.get_users()
+    for name in tmp_pass_users:
+        user = tmp_pass_users[name]
         status = "0"
         if name in online_users:
             status = "1"
@@ -282,6 +282,29 @@ def add_user():
         item = [request.form[key] for key in key_list]
         print MysqlManager.insert_user(item)
         return "ok"
+
+@app.route('/addUserMoney', methods=['GET', 'POST'])
+def add_user_money():
+    if request.method == 'POST':
+        user_name = request.form['UserName']
+        add_money = request.form['Money']
+        print MysqlManager.user_add_money(user_name, add_money)
+        return 'ok'
+
+@app.route('/modifyUserStar', methods=['GET', 'POST'])
+def modify_user_star():
+    if request.method == 'POST':
+        user_name = request.form['UserName']
+        star = request.form['Star']
+        print MysqlManager.user_modify_star(user_name, star)
+        return 'ok'
+
+@app.route('/deleteUser', methods=['GET', 'POST'])
+def delete_user():
+    if request.method == 'POST':
+        user_name = request.form['UserName']
+        MysqlManager.user_delete(user_name)
+        return 'ok'
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True, gevent=100)
